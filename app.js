@@ -30,13 +30,10 @@ initializeDBAndServer();
 // GET Movies API
 
 app.get("/movies/", async (request, response) => {
-  const getMoviesQuery = `SELECT * FROM movie;`;
+  const getMoviesQuery = `SELECT movie_name FROM movie;`;
   const dbResponse = await db.all(getMoviesQuery);
   const output = dbResponse.map((each) => ({
-    movieId: each.movie_id,
-    directorId: each.director_id,
     movieName: each.movie_name,
-    leadActor: each.lead_actor,
   }));
   response.send(output);
 });
@@ -99,9 +96,11 @@ app.get("/directors/", async (request, response) => {
 // GET Specific Director Movies API
 app.get("/directors/:directorId/movies/", async (request, response) => {
   const { directorId } = request.params;
-  const directorSpecificMoviesQuery = `SELECT movie_name as movieName FROM movie WHERE director_id = ${directorId};`;
+  const directorSpecificMoviesQuery = `SELECT movie_name FROM movie WHERE director_id = ${directorId};`;
   const dbResponse = await db.all(directorSpecificMoviesQuery);
-  response.send(dbResponse);
+  response.send(
+    dbResponse.map((eachMovie) => ({ movieName: eachMovie.movie_name }))
+  );
 });
 
 module.exports = app;
